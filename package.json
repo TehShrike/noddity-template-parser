@@ -1,0 +1,32 @@
+{
+  "name": "noddity-renderer",
+  "version": "0.0.0",
+  "description": "Turns Noddity posts into html and stuff",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TehShrike/noddity-renderer.git"
+  },
+  "keywords": [
+    "noddity"
+  ],
+  "author": "TehShrike",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/TehShrike/noddity-renderer/issues"
+  },
+  "homepage": "https://github.com/TehShrike/noddity-renderer",
+  "devDependencies": {
+    "level-mem": "^0.18.0",
+    "noddity-butler": "^1.1.2",
+    "noddity-linkifier": "^1.0.0",
+    "ractive": "^0.4.0",
+    "tape": "^2.13.1"
+  },
+  "dependencies": {
+    "pagedown": "^1.1.0"
+  }
+}
