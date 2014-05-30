@@ -1,7 +1,7 @@
 var test = require('tape').test
 var Butler = require('noddity-butler')
 var TestRetrieval = require('noddity-butler/test/retrieval/stub.js')
-var updater = require('../templateUpdater.js')
+var render = require('../staticRenderer')
 var levelmem = require('level-mem')
 var linkify = require('noddity-linkifier')('')
 
@@ -29,10 +29,9 @@ test('Embeds a template', function(t) {
 
 	t.plan(2)
 
-	var res = updater(state.butler, linkify, {}, 'file1.md', function(err, html) {
+	render(state.butler.getPost, linkify, 'file1.md', null, function(err, html) {
 		t.notOk(err, 'No error')
-		t.equal(html, '<p>This is a <p>lol yeah</p> post that I <em>totally</em> wrote</p>')
-		res.emit('teardown')
+		t.equal(html, '<p>This is a</p><p>lol yeah</p> post that I <em>totally</em> wrote<p></p>')
 		state.butler.stop()
 		t.end()
 	})
