@@ -65,14 +65,12 @@ function parseTemplate(parentDataObject, html) {
 
 function render(templateHtml, data, cb) {
 	try {
-		console.log("==============About to render", templateHtml, "with", data)
 		var html = new Ractive({
 			el: null,
 			data: data,
 			template: templateHtml,
 			preserveWhitespace: true
 		}).toHTML()
-		console.log("==============Turned it into", html)
 		cb(null, html)
 	} catch (err) {
 		cb(err)
