@@ -1,6 +1,6 @@
 {
   "name": "noddity-renderer",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Turns Noddity posts into html and stuff",
   "main": "index.js",
   "scripts": {
