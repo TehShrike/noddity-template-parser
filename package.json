@@ -1,6 +1,6 @@
 {
   "name": "noddity-renderer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Turns Noddity posts into html and stuff",
   "main": "index.js",
   "scripts": {
@@ -23,10 +23,10 @@
     "level-mem": "^0.18.0",
     "noddity-butler": "^1.1.2",
     "noddity-linkifier": "^1.0.0",
-    "ractive": "^0.4.0",
     "tape": "^2.13.1"
   },
   "dependencies": {
+    "ractive": "^0.4.0",
     "pagedown": "^1.1.0"
   }
 }
