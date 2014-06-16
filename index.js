@@ -1,67 +1,7 @@
 var Ractive = require('ractive')
 var toolbox = require('./templateToolbox.js')
-var Converter = require('pagedown').Converter
-var numberOfOccurrances = require('./numberOfOccurrances.js')
-
-var converter = new Converter()
-
-function htmlify(post) {
-	return (post.metadata.markdown !== false) ? converter.makeHtml(post.content) : post.content
-}
-
-function getTemplateDataObject(parentDataObject, pieces) {
-	var dataz = Object.create(parentDataObject)
-	var unnamedParameters = 0
-
-	pieces.forEach(function(piece) {
-		var keyAndValue = piece.split('=')
-		var key, value
-
-		if (keyAndValue.length > 1) {
-			key = keyAndValue[0]
-			value = keyAndValue[1]
-		} else {
-			unnamedParameters++
-			key = unnamedParameters
-			value = keyAndValue[0]
-		}
-
-		dataz[key] = value
-	})
-	return dataz
-}
-
-function parseTemplate(parentDataObject, html) {
-	var templateParsingResults = {
-		elements: [],
-		replaceTemplateElementWithHtml: function(documentHtml, elementId, templateHtml) {
-			var spanText = toolbox.generatePostDiv(elementId)
-			return documentHtml.replace(spanText, templateHtml)
-		}
-	}
-
-	templateParsingResults.html = html.replace(/::([^:]+)::/gm, function(match, templateText, offset, wholeString) {
-		var numberOfPrecedingCodeOpeners = numberOfOccurrances('<code', wholeString.substr(0, offset))
-		var numberOfPrecedingCodeClosers = numberOfOccurrances('</code', wholeString.substr(0, offset))
-
-		if (numberOfPrecedingCodeOpeners !== numberOfPrecedingCodeClosers) {
-			return match
-		} else {
-			var parsedTemplate = {}
-
-			var pieces = templateText.split('|')
-			parsedTemplate.postName = pieces.shift(0)
-			parsedTemplate.elementId = toolbox.generateId(parsedTemplate.postName)
-			parsedTemplate.data = getTemplateDataObject(parentDataObject, pieces)
-
-			templateParsingResults.elements.push(parsedTemplate)
-
-			return toolbox.generatePostDiv(parsedTemplate.elementId)
-		}
-	})
-
-	return templateParsingResults
-}
+var parseTemplate = require('./parseTemplate')
+var htmlify = toolbox.htmlify
 
 function render(templateHtml, data, cb) {
 	try {
@@ -88,11 +28,10 @@ function makeHtmlFromPostName(getPost, linkify, postName, data, cb) {
 }
 
 function makeHtmlFromPost(getPost, linkify, post, data, cb) {
-	var html = linkify(htmlify(post))
-	var templatesFromHtml = parseTemplate(data, html)
+	var templatesFromHtml = parseTemplate(data, linkify(htmlify(post)))
+	var html = templatesFromHtml.html
 	var templateContentsResolved = 0
 
-	html = templatesFromHtml.html
 	templatesFromHtml.elements.forEach(function(templateData) {
 		makeHtmlFromPostName(getPost, linkify, templateData.postName, templateData.data, function(err, childHtml) {
 			templateContentsResolved += 1
@@ -112,7 +51,92 @@ function makeHtmlFromPost(getPost, linkify, post, data, cb) {
 }
 
 
+/////////// live refreshing version ///////////
+
+function populateTemplateDivsInPost(butler, linkify, ractive, post, data, templatesFromHtml) {
+	var childRactives = []
+
+	if (!templatesFromHtml) {
+		templatesFromHtml = parseTemplate(data, linkify(htmlify(post)))
+	}
+
+	var html = templatesFromHtml.html
+
+	ractive.set('html', html)
+	ractive.set('metadata', post.metadata)
+
+	templatesFromHtml.elements.forEach(function(templateData) {
+		createRactiveElementFromPostName(butler, linkify, templateData, function(err, childRactive) {
+			childRactives.push(childRactive)
+		})
+	})
+
+	function teardownChildren() {
+		childRactives.forEach(function(ractive) {
+			ractive.teardown()
+		})
+	}
+
+	ractive.on('teardown', teardownChildren)
+
+	return teardownChildren
+}
+
+function imprintPostOnRactiveElement(butler, linkify, ractive, post, parentDataObject, templatesFromHtml) {
+	butler.setMaxListeners(20)
+	var teardownChildren = null
+	function updatePostContent(key, newValue, oldValue) {
+		if (key === post.filename) {
+			if (typeof teardownChildren === 'function') {
+				teardownChildren()
+			}
+			teardownChildren = populateTemplateDivsInPost(butler, linkify, ractive, newValue, parentDataObject, templatesFromHtml)
+		}
+	}
+
+	updatePostContent(post.filename, post, null)
+
+	butler.on('post changed', updatePostContent)
+
+	ractive.on('teardown', function() {
+		butler.removeListener('post changed', updatePostContent)
+		teardownChildren()
+	})
+}
+
+
+function createRactiveElementFromPostName(butler, linkify, templateData, cb) {
+	var postName = templateData.postName
+	var element = templateData.elementId
+	var data = templateData.data
+
+	butler.getPost(postName, function(err, post) {
+		var ractive
+
+		if (err) {
+			 ractive = new Ractive({
+				el: element,
+				data: data,
+				template: '{{error}}'
+			})
+			ractive.set('error', 'Error loading post! ' + err.message)
+		} else {
+			var templatesFromHtml = parseTemplate(data, linkify(htmlify(post)))
+			ractive = new Ractive({
+				el: element,
+				data: data,
+				template: templatesFromHtml.html
+			})
+			imprintPostOnRactiveElement(butler, linkify, ractive, post, data, templatesFromHtml)
+		}
+
+		cb(err, ractive)
+	})
+}
+
+
 module.exports = {
 	makeHtmlFromPost: makeHtmlFromPost,
-	makeHtmlFromPostName: makeHtmlFromPostName
+	makeHtmlFromPostName: makeHtmlFromPostName,
+	imprintPostOnRactiveElement: imprintPostOnRactiveElement
 }

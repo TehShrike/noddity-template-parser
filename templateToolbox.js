@@ -1,4 +1,11 @@
+var Converter = require('pagedown').Converter
+var converter = new Converter()
+
 var rgxPostDivId = /noddity_post_(.+)_[\da-z]{12}4[\da-z]{19}/
+
+function htmlify(post) {
+	return (post.metadata.markdown !== false) ? converter.makeHtml(post.content) : post.content
+}
 
 function UUIDv4() {
 	return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -53,5 +60,6 @@ module.exports = {
 	getPostName: getPostName,
 	generatePostDiv: generatePostDiv,
 	isAPostDiv: isAPostDiv,
-	getTemplateDataObject: getTemplateDataObject
+	getTemplateDataObject: getTemplateDataObject,
+	htmlify: htmlify
 }
