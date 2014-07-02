@@ -1,5 +1,10 @@
-var toolbox = require('./toolbox')
+var toolbox = require('./templateToolbox')
 var numberOfOccurrances = require('./numberOfOccurrances')
+var EventEmitter = require('events').EventEmitter
+
+function makeNewMixinObject() {
+	return Object.create(new EventEmitter())
+}
 
 function getTemplateDataObject(parentDataObject, pieces) {
 	var dataz = Object.create(parentDataObject)
@@ -23,36 +28,35 @@ function getTemplateDataObject(parentDataObject, pieces) {
 	return dataz
 }
 
-function parseTemplate(parentDataObject, html) {
-	var templateParsingResults = {
-		elements: [],
-		replaceTemplateElementWithHtml: function(documentHtml, elementId, templateHtml) {
-			var spanText = toolbox.generatePostDiv(elementId)
-			return documentHtml.replace(spanText, templateHtml)
-		}
+function parseTemplate(mixin) {
+	var parentDataObject = mixin.data
+	if (!parentDataObject) {
+		parentDataObject = mixin.ractive ? mixin.ractive.get() : {}
 	}
 
-	templateParsingResults.html = html.replace(/::([^:]+)::/gm, function(match, templateText, offset, wholeString) {
+	mixin.templateElements = []
+
+	mixin.html = mixin.html.replace(/::([^:]+)::/gm, function(match, templateText, offset, wholeString) {
 		var numberOfPrecedingCodeOpeners = numberOfOccurrances('<code', wholeString.substr(0, offset))
 		var numberOfPrecedingCodeClosers = numberOfOccurrances('</code', wholeString.substr(0, offset))
 
 		if (numberOfPrecedingCodeOpeners !== numberOfPrecedingCodeClosers) {
 			return match
 		} else {
-			var parsedTemplate = {}
+			var parsedTemplate = makeNewMixinObject()
 
 			var pieces = templateText.split('|')
 			parsedTemplate.postName = pieces.shift(0)
 			parsedTemplate.elementId = toolbox.generateId(parsedTemplate.postName)
 			parsedTemplate.data = getTemplateDataObject(parentDataObject, pieces)
 
-			templateParsingResults.elements.push(parsedTemplate)
+			mixin.templateElements.push(parsedTemplate)
 
 			return toolbox.generatePostDiv(parsedTemplate.elementId)
 		}
 	})
 
-	return templateParsingResults
+	return mixin
 }
 
 module.exports = parseTemplate

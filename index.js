@@ -1,142 +1,106 @@
-var Ractive = require('ractive')
-var toolbox = require('./templateToolbox.js')
-var parseTemplate = require('./parseTemplate')
-var htmlify = toolbox.htmlify
+var Mixins = require('./mixins')
 
-function render(templateHtml, data, cb) {
-	try {
-		var html = new Ractive({
-			el: null,
-			data: data,
-			template: templateHtml,
-			preserveWhitespace: true
-		}).toHTML()
-		cb(null, html)
-	} catch (err) {
-		cb(err)
-	}
-}
+function Renderer(butler, linkify) {
+	var mixins = Mixins(butler, linkify)
 
-function makeHtmlFromPostName(getPost, linkify, postName, data, cb) {
-	getPost(postName, function(err, post) {
-		if (err) {
-			cb(err)
-		} else {
-			makeHtmlFromPost(getPost, linkify, post, data, cb)
-		}
-	})
-}
-
-function makeHtmlFromPost(getPost, linkify, post, data, cb) {
-	var templatesFromHtml = parseTemplate(data, linkify(htmlify(post)))
-	var html = templatesFromHtml.html
-	var templateContentsResolved = 0
-
-	templatesFromHtml.elements.forEach(function(templateData) {
-		makeHtmlFromPostName(getPost, linkify, templateData.postName, templateData.data, function(err, childHtml) {
-			templateContentsResolved += 1
-			if (err) {
-				console.log(err.message)
-			} else {
-				html = templatesFromHtml.replaceTemplateElementWithHtml(html, templateData.elementId, childHtml)
-			}
-			if (templateContentsResolved === templatesFromHtml.elements.length) {
-				render(html, templateData.data, cb)
-			}
-		})
-	})
-	if (templatesFromHtml.elements.length === 0) {
-		render(html, data || {}, cb)
-	}
-}
-
-
-/////////// live refreshing version ///////////
-
-function populateTemplateDivsInPost(butler, linkify, ractive, post, data, templatesFromHtml) {
-	var childRactives = []
-
-	if (!templatesFromHtml) {
-		templatesFromHtml = parseTemplate(data, linkify(htmlify(post)))
-	}
-
-	var html = templatesFromHtml.html
-
-	ractive.set('html', html)
-	ractive.set('metadata', post.metadata)
-
-	templatesFromHtml.elements.forEach(function(templateData) {
-		createRactiveElementFromPostName(butler, linkify, templateData, function(err, childRactive) {
-			childRactives.push(childRactive)
-		})
-	})
-
-	function teardownChildren() {
-		childRactives.forEach(function(ractive) {
-			ractive.teardown()
+	function renderMixin(mixin) {
+		mixins.mixinHtml(mixin)
+		mixins.parseTemplate(mixin)
+		mixins.mixinChildPosts(mixin)
+		mixins.mixinRenderedHtmlEmitter(mixin)
+		mixin.on('all child posts fetched', function(mixin) {
+			mixin.templateElements.forEach(renderMixin)
 		})
 	}
 
-	ractive.on('teardown', teardownChildren)
+	function renderPost(post, cb) {
+		var mixin = mixins.makeNewMixinObject(post)
+		renderMixin(mixin)
 
-	return teardownChildren
-}
-
-function imprintPostOnRactiveElement(butler, linkify, ractive, post, parentDataObject, templatesFromHtml) {
-	butler.setMaxListeners(20)
-	var teardownChildren = null
-	function updatePostContent(key, newValue, oldValue) {
-		if (key === post.filename) {
-			if (typeof teardownChildren === 'function') {
-				teardownChildren()
-			}
-			teardownChildren = populateTemplateDivsInPost(butler, linkify, ractive, newValue, parentDataObject, templatesFromHtml)
-		}
+		mixin.on('final html rendered', function(mixin) {
+			cb(null, mixin.renderedHtml)
+		})
 	}
 
-	updatePostContent(post.filename, post, null)
+	function createChildRactive(mixin) {
+		mixins.mixinHtml(mixin)
+		mixins.parseTemplate(mixin)
+		mixins.mixinTemplateRactive(mixin)
+		mixins.updateEmitterMixin(mixin)
+		mixins.mixinTeardownChildren(mixin)
+		mixins.mixinChildPosts(mixin)
 
-	butler.on('post changed', updatePostContent)
+		mixin.on('child post fetched', function(childMixin) {
+			if (!mixin.torndown) {
+				createChildRactive(childMixin)
+				mixin.children.push(childMixin)
+			}
+		})
 
-	ractive.on('teardown', function() {
-		butler.removeListener('post changed', updatePostContent)
-		teardownChildren()
-	})
-}
+		mixin.on('post changed', function(newPost) {
+			var replacement = mixins.makeNewMixinObject(newPost)
+			replacement.elementId = mixin.elementId
+			replacement.data = mixin.data
 
+			mixin.ractive.teardown()
+			mixin.removeAllListeners()
+			createChildRactive(replacement)
+		})
 
-function createRactiveElementFromPostName(butler, linkify, templateData, cb) {
-	var postName = templateData.postName
-	var element = templateData.elementId
-	var data = templateData.data
+		mixin.ractive.on('teardown', function teardown() {
+			mixin.torndown = true
+			mixin.teardownChildren()
+			mixin.removeAllListeners()
+		})
+	}
 
-	butler.getPost(postName, function(err, post) {
-		var ractive
-
-		if (err) {
-			 ractive = new Ractive({
-				el: element,
-				data: data,
-				template: '{{error}}'
-			})
-			ractive.set('error', 'Error loading post! ' + err.message)
-		} else {
-			var templatesFromHtml = parseTemplate(data, linkify(htmlify(post)))
-			ractive = new Ractive({
-				el: element,
-				data: data,
-				template: templatesFromHtml.html
-			})
-			imprintPostOnRactiveElement(butler, linkify, ractive, post, data, templatesFromHtml)
+	function mixinRootPostChangeWatcher(mixin) {
+		function update(newPost) {
+			mixin.teardownChildren()
+			populateRootRactive(newPost, mixin.ractive)
 		}
 
-		cb(err, ractive)
-	})
+		mixin.on('post changed', update)
+
+		mixin.change = function(newPost) {
+			mixin.removeListener('post changed', update)
+			update(newPost)
+		}
+
+		mixin.ractive.on('teardown', function() {
+			mixin.teardownChildren()
+			mixin.torndown = true
+		})
+	}
+
+	function populateRootRactive(post, ractive) {
+		var mixin = mixins.makeNewMixinObject(post)
+		mixin.ractive = ractive
+		mixins.mixinHtml(mixin)
+		mixins.parseTemplate(mixin)
+		mixins.updateEmitterMixin(mixin)
+		mixins.mixinTeardownChildren(mixin)
+		mixins.mixinChildPosts(mixin)
+		mixinRootPostChangeWatcher(mixin)
+
+		mixin.on('child post fetched', function(childMixin) {
+			if (!mixin.torndown) {
+				createChildRactive(childMixin)
+				mixin.children.push(childMixin)
+			}
+		})
+
+		ractive.set('html', mixin.html)
+		ractive.set('metadata', post.metadata)
+		ractive.set('current', post.filename)
+
+		return mixin.change
+	}
+
+	return {
+		populateRootRactive: populateRootRactive,
+		renderPost: renderPost
+	}
 }
 
-
-module.exports = {
-	makeHtmlFromPost: makeHtmlFromPost,
-	makeHtmlFromPostName: makeHtmlFromPostName,
-	imprintPostOnRactiveElement: imprintPostOnRactiveElement
-}
+module.exports = Renderer
