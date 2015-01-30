@@ -9,10 +9,6 @@ function Renderer(butler, linkify) {
 		mixins.mixinChildPosts(mixin)
 		mixins.mixinRenderedHtmlEmitter(mixin)
 
-		mixin.data = mixin.data || {}
-		mixin.data.current = mixin.post.filename
-		mixin.data.metadata = mixin.post.metadata
-
 		mixin.on('all child posts fetched', function(mixin) {
 			mixin.templateElements.forEach(renderMixin)
 		})
