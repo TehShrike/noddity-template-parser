@@ -8,6 +8,11 @@ function Renderer(butler, linkify) {
 		mixins.parseTemplate(mixin)
 		mixins.mixinChildPosts(mixin)
 		mixins.mixinRenderedHtmlEmitter(mixin)
+
+		mixin.data = mixin.data || {}
+		mixin.data.current = mixin.post.filename
+		mixin.data.metadata = mixin.post.metadata
+
 		mixin.on('all child posts fetched', function(mixin) {
 			mixin.templateElements.forEach(renderMixin)
 		})
@@ -15,6 +20,7 @@ function Renderer(butler, linkify) {
 
 	function renderPost(post, cb) {
 		var mixin = mixins.makeNewMixinObject(post)
+
 		renderMixin(mixin)
 
 		mixin.on('final html rendered', function(mixin) {
@@ -90,9 +96,11 @@ function Renderer(butler, linkify) {
 			}
 		})
 
-		ractive.set('html', mixin.html)
-		ractive.set('metadata', post.metadata)
-		ractive.set('current', post.filename)
+		ractive.set({
+			html: mixin.html,
+			metadata: post.metadata,
+			current: post.filename
+		})
 
 		return mixin.change
 	}
