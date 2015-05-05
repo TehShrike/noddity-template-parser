@@ -34,7 +34,7 @@ test('Embeds a template', function(t) {
 		t.notOk(err, 'No error')
 		renderer.renderPost(post, function(err, html) {
 			t.notOk(err, 'No error')
-			t.equal(html, '<p>This is a </p><p>lol yeah</p> post that I <em>totally</em> wrote<p></p>')
+			t.equal(html, '<p>This is a </p><p>lol yeah</p>\n post that I <em>totally</em> wrote<p>\n</p>')
 			state.butler.stop()
 			t.end()
 		})
@@ -56,7 +56,7 @@ test('Embeds a template with arguments', function(t) {
 		t.notOk(err, 'No error')
 		renderer.renderPost(post, function(err, html) {
 			t.notOk(err, 'No error')
-			t.equal(html, '<p>This is a </p><p>lol yeah lookit wat lookit huh</p> post that I <em>totally</em> wrote<p></p>')
+			t.equal(html, '<p>This is a </p><p>lol yeah lookit wat lookit huh</p>\n post that I <em>totally</em> wrote<p>\n</p>')
 			state.butler.stop()
 			t.end()
 		})

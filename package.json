@@ -27,6 +27,6 @@
   },
   "dependencies": {
     "ractive": "^0.4.0",
-    "pagedown": "^1.1.0"
+    "remarkable": "^1.6.0"
   }
 }

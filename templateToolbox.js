@@ -1,10 +1,14 @@
-var Converter = require('pagedown').Converter
-var converter = new Converter()
+var Remarkable = require('remarkable')
 
 var rgxPostDivId = /noddity_post_(.+)_[\da-z]{12}4[\da-z]{19}/
 
+var md = new Remarkable('full', {
+	html: true,
+	linkify: true
+})
+
 function htmlify(post) {
-	return (post.metadata.markdown !== false) ? converter.makeHtml(post.content) : post.content
+	return (post.metadata.markdown !== false) ? md.render(post.content) : post.content
 }
 
 function UUIDv4() {
