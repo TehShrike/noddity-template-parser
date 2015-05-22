@@ -4,7 +4,7 @@
   "description": "Turns Noddity posts into html and stuff",
   "main": "index.js",
   "scripts": {
-    "test": "node test/*.js"
+    "test": "tape test/*.js"
   },
   "repository": {
     "type": "git",
@@ -21,12 +21,12 @@
   "homepage": "https://github.com/TehShrike/noddity-renderer",
   "devDependencies": {
     "level-mem": "^0.18.0",
-    "noddity-butler": "^1.1.2",
-    "noddity-linkifier": "^1.0.0",
-    "tape": "^2.13.1"
+    "noddity-butler": "^2.0.0",
+    "noddity-linkifier": "^2.1.0",
+    "tape": "^4.0.0"
   },
   "dependencies": {
-    "ractive": "^0.4.0",
+    "ractive": "^0.7.3",
     "remarkable": "^1.6.0"
   }
 }
