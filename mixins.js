@@ -3,15 +3,18 @@ var htmlify = toolbox.htmlify
 var EventEmitter = require('events').EventEmitter
 var Ractive = require('ractive')
 var updateEmitterMixinFactory = require('./updateEmitterMixin.js')
+var cheerio = require('cheerio')
 
 var errorTemplate = Ractive.parse('{{error}}')
 
 function render(mixin) {
+	var templateHtml = cheerio.load(mixin.renderedHtml || mixin.html).html()
+
 	try {
 		return new Ractive({
 			el: null,
 			data: mixin.data,
-			template: mixin.renderedHtml || mixin.html,
+			template: templateHtml,
 			preserveWhitespace: true
 		}).toHTML()
 	} catch (err) {

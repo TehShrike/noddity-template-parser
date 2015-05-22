@@ -3,7 +3,7 @@ var Butler = require('noddity-butler')
 var TestRetrieval = require('noddity-butler/test/retrieval/stub.js')
 var Renderer = require('../')
 var levelmem = require('level-mem')
-var linkify = require('noddity-linkifier')('')
+var linkify = require('noddity-linkifier')('').linkify
 
 function testState() {
 	var retrieval = new TestRetrieval()
@@ -34,7 +34,7 @@ test('Embeds a template', function(t) {
 		t.notOk(err, 'No error')
 		renderer.renderPost(post, function(err, html) {
 			t.notOk(err, 'No error')
-			t.equal(html, '<p>This is a </p><p>lol yeah</p>\n post that I <em>totally</em> wrote<p>\n</p>')
+			t.equal(html, '<p>This is a </p><p>lol yeah</p>\n post that I <em>totally</em> wrote<p></p>\n')
 			state.butler.stop()
 			t.end()
 		})
@@ -56,7 +56,7 @@ test('Embeds a template with arguments', function(t) {
 		t.notOk(err, 'No error')
 		renderer.renderPost(post, function(err, html) {
 			t.notOk(err, 'No error')
-			t.equal(html, '<p>This is a </p><p>lol yeah lookit wat lookit huh</p>\n post that I <em>totally</em> wrote<p>\n</p>')
+			t.equal(html, '<p>This is a </p><p>lol yeah lookit wat lookit huh</p>\n post that I <em>totally</em> wrote<p></p>\n')
 			state.butler.stop()
 			t.end()
 		})
