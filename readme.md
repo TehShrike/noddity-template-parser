@@ -11,13 +11,15 @@ Usage
 
 The module exports a single constructor function that takes two arguments: a [noddity-butler](https://github.com/TehShrike/noddity-butler), and the linkify function of a [noddity-linkifier](https://github.com/TehShrike/noddity-linkifier).
 
-	var Butler = require('noddity-butler')
-	var Linkifier = require('noddity-linkifier')
-	var Renderer = require('noddity-renderer')
+```js
+var Butler = require('noddity-butler')
+var Linkifier = require('noddity-linkifier')
+var Renderer = require('noddity-renderer')
 
-	var linkifyEmitter = new Linkifier('http://yoursite.com/#!post/')
-	var butler = new Butler(noddityRoot, yourDb, butlerOptions)
-	var renderer = new Renderer(butler, linkifyEmitter.linkify)
+var linkifyEmitter = new Linkifier('http://yoursite.com/#!post/')
+var butler = new Butler(noddityRoot, yourDb, butlerOptions)
+var renderer = new Renderer(butler, linkifyEmitter.linkify)
+```
 
 The Noddity renderer has two functions, each almost entirely different in purpose.  I was very tempted to release them as two modules, but I was having a real difficult time figuring out how to share code between them, since their flows are so different.
 
