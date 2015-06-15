@@ -36,7 +36,7 @@ function parseTemplate(mixin) {
 
 	mixin.templateElements = []
 
-	mixin.html = mixin.html.replace(/::([^:]+)::/gm, function(match, templateText, offset, wholeString) {
+	mixin.html = mixin.html.replace(/::(.+?)::/gm, function(match, templateText, offset, wholeString) {
 		var numberOfPrecedingCodeOpeners = numberOfOccurrances('<code', wholeString.substr(0, offset))
 		var numberOfPrecedingCodeClosers = numberOfOccurrances('</code', wholeString.substr(0, offset))
 
