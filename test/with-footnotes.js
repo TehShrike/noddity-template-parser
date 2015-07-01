@@ -7,8 +7,8 @@ test('Embeds a template', function(t) {
 	var state = testState()
 
 	var str = require('fs').readFileSync('./test/helpers/file-with-footnotes.md', { encoding: 'utf8' })
-	state.retrieval.addPost('file1.md', 'Some title', new Date(), str)
-	state.retrieval.addPost('file2.md', 'Some title', new Date(), 'lol yeah')
+	state.retrieval.addPost('file1.md', { title: 'Some title', date: new Date() }, str)
+	state.retrieval.addPost('file2.md', { title: 'Some title', date: new Date() }, 'lol yeah')
 
 	var renderer = new Renderer(state.butler, linkify)
 

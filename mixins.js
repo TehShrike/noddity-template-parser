@@ -8,7 +8,10 @@ var cheerio = require('cheerio')
 var errorTemplate = Ractive.parse('{{error}}')
 
 function render(mixin) {
-	var templateHtml = cheerio.load(mixin.renderedHtml || mixin.html).html()
+	var templateHtml = mixin.renderedHtml || mixin.html
+	if (mixin.post.metadata.markdown !== false) {
+		templateHtml = cheerio.load(templateHtml).html()
+	}
 
 	try {
 		return new Ractive({
