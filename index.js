@@ -14,6 +14,23 @@ function Renderer(butler, linkify) {
 		})
 	}
 
+	function renderMarkdown(post, cb) {
+		var mixin = mixins.makeNewMixinObject(post)
+
+		mixin.html = linkify(post.content) // skip the html step entirely for the top-level post
+		mixins.parseTemplate(mixin)
+		mixins.mixinChildPosts(mixin)
+		mixins.mixinRenderedHtmlEmitter(mixin)
+
+		mixin.on('all child posts fetched', function(mixin) {
+			mixin.templateElements.forEach(renderMixin)
+		})
+
+		mixin.on('final html rendered', function(mixin) {
+			cb(null, mixin.renderedHtml)
+		})
+	}
+
 	function renderPost(post, cb) {
 		var mixin = mixins.makeNewMixinObject(post)
 
@@ -103,7 +120,8 @@ function Renderer(butler, linkify) {
 
 	return {
 		populateRootRactive: populateRootRactive,
-		renderPost: renderPost
+		renderPost: renderPost,
+		renderMarkdown: renderMarkdown
 	}
 }
 

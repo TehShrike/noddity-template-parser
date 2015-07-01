@@ -1,25 +1,7 @@
 var test = require('tape').test
-var Butler = require('noddity-butler')
-var TestRetrieval = require('noddity-butler/test/retrieval/stub.js')
 var Renderer = require('../')
-var levelmem = require('level-mem')
 var linkify = require('noddity-linkifier')('').linkify
-
-function testState() {
-	var retrieval = new TestRetrieval()
-	var db = levelmem('no location', {
-		valueEncoding: require('noddity-butler/test/retrieval/encoding.js')
-	})
-	var butler = new Butler(retrieval, db, {
-		refreshEvery: 100
-	})
-
-	return {
-		butler: butler,
-		retrieval: retrieval,
-		db: db
-	}
-}
+var testState = require('./helpers/test-state')
 
 test('Embeds a template', function(t) {
 	var state = testState()
