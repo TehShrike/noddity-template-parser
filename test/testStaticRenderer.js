@@ -26,10 +26,9 @@ test('Embeds a template', function(t) {
 test('Embeds a template with arguments', function(t) {
 	var state = testState()
 
-	state.retrieval.addPost('file1.md', 'Some title', new Date(), 'This is a ::file2.md:: post that I *totally* wrote')
-	state.retrieval.addPost('file2.md', 'Some title', new Date(), 'lol yeah ::herp|wat:: ::herp|huh::')
-	state.retrieval.addPost('herp', 'Some title', new Date(), 'lookit {{1}}')
-	state.retrieval.getPostSync('herp').metadata.markdown = false
+	state.retrieval.addPost('file1.md', { title: 'Some title', date: new Date() }, 'This is a ::file2.md:: post that I *totally* wrote')
+	state.retrieval.addPost('file2.md', { title: 'Some title', date: new Date() }, 'lol yeah ::herp|wat:: ::herp|huh::')
+	state.retrieval.addPost('herp', { title: 'Some title', date: new Date(), markdown: false }, 'lookit {{1}}')
 
 	t.plan(3)
 	var renderer = new Renderer(state.butler, linkify)

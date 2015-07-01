@@ -30,7 +30,4 @@ module.exports = function TestRetrieval() {
 			}
 		})
 	}
-	this.getPostSync = function(name) {
-		return posts[name]
-	}
 }

@@ -3,7 +3,7 @@ var Renderer = require('../')
 var linkify = require('noddity-linkifier')('').linkify
 var testState = require('./helpers/test-state')
 
-test('Embeds a template andn spits out markdown', function(t) {
+test('Embeds a template and spits out markdown', function(t) {
 	var state = testState()
 
 	state.retrieval.addPost('file1.md', { title: 'Some title', date: new Date() }, 'Check it out ::file2.md:: \n\n[^1]:	*Collected Sermons* volume 10, p. 310.\n')
