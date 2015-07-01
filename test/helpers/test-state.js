@@ -1,4 +1,4 @@
-var TestRetrieval = require('noddity-butler/test/retrieval/stub.js')
+var TestRetrieval = require('./retrieval-stub.js')
 var levelmem = require('level-mem')
 var Butler = require('noddity-butler')
 

@@ -6,8 +6,8 @@ var testState = require('./helpers/test-state')
 test('Embeds a template', function(t) {
 	var state = testState()
 
-	state.retrieval.addPost('file1.md', 'Some title', new Date(), 'This is a ::file2.md:: post that I *totally* wrote')
-	state.retrieval.addPost('file2.md', 'Some title', new Date(), 'lol yeah')
+	state.retrieval.addPost('file1.md', { title: 'Some title', date: new Date() }, 'This is a ::file2.md:: post that I *totally* wrote')
+	state.retrieval.addPost('file2.md', { title: 'Some title', date: new Date() }, 'lol yeah')
 
 	t.plan(3)
 	var renderer = new Renderer(state.butler, linkify)
