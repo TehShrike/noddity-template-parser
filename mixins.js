@@ -77,27 +77,32 @@ function mixinHtml(linkify, mixin) {
 	return mixin
 }
 
+function renderChildrenIntoTemplates(mixin, cb) {
+	if (mixin.templateElements.length === 0) {
+		process.nextTick(function() {
+			cb(mixin)
+		})
+	} else {
+		var mergedSoFar = 0
+		function mergeChildHtmlIntoMixin(childMixin) {
+			replaceTemplateElementWithHtml(mixin, childMixin)
+			mergedSoFar += 1
+			if (mergedSoFar >= mixin.templateElements.length) {
+				cb(mixin)
+			}
+		}
+		mixin.templateElements.forEach(function(childMixin) {
+			childMixin.once('final html rendered', mergeChildHtmlIntoMixin)
+		})
+	}
+}
+
 function mixinRenderedHtmlEmitter(mixin) {
 	mixin.on('all child posts fetched', function(mixin) {
-		if (mixin.templateElements.length === 0) {
+		renderChildrenIntoTemplates(mixin, function(mixin) {
 			mixin.renderedHtml = render(mixin)
-			process.nextTick(function() {
-				mixin.emit('final html rendered', mixin)
-			})
-		} else {
-			var mergedSoFar = 0
-			function mergeChildHtmlIntoRenderedHtml(childMixin) {
-				replaceTemplateElementWithHtml(mixin, childMixin)
-				mergedSoFar += 1
-				if (mergedSoFar >= mixin.templateElements.length) {
-					mixin.renderedHtml = render(mixin)
-					mixin.emit('final html rendered', mixin)
-				}
-			}
-			mixin.templateElements.forEach(function(childMixin) {
-				childMixin.once('final html rendered', mergeChildHtmlIntoRenderedHtml)
-			})
-		}
+			mixin.emit('final html rendered', mixin)
+		})
 	})
 
 	return mixin
@@ -145,6 +150,7 @@ module.exports = function(butler, linkify) {
 		mixinChildPosts: mixinChildPosts.bind(null, butler.getPost),
 		updateEmitterMixin: updateEmitterMixinFactory(butler),
 		mixinTemplateRactive: mixinTemplateRactive,
-		mixinTeardownChildren: mixinTeardownChildren
+		mixinTeardownChildren: mixinTeardownChildren,
+		renderChildrenIntoTemplates: renderChildrenIntoTemplates
 	}
 }

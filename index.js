@@ -30,14 +30,12 @@ function Renderer(butler, linkify) {
 		mixin.html = linkify(post.content) // skip the html step entirely for the top-level post
 		mixins.parseTemplate(mixin)
 		mixins.mixinChildPosts(mixin)
-		mixins.mixinRenderedHtmlEmitter(mixin)
 
 		mixin.on('all child posts fetched', function(mixin) {
 			mixin.templateElements.forEach(renderMixin)
-		})
-
-		mixin.on('final html rendered', function(mixin) {
-			cb(null, mixin.renderedHtml)
+			mixins.renderChildrenIntoTemplates(mixin, function(mixin) {
+				cb(null, mixin.renderedHtml)
+			})
 		})
 	}
 
