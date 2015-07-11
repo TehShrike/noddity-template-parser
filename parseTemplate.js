@@ -1,13 +1,14 @@
 var toolbox = require('./templateToolbox')
 var numberOfOccurrances = require('./numberOfOccurrances')
 var EventEmitter = require('events').EventEmitter
+var extend = require('xtend')
 
 function makeNewMixinObject() {
 	return Object.create(new EventEmitter())
 }
 
 function getTemplateDataObject(parentDataObject, pieces) {
-	var dataz = Object.create(parentDataObject)
+	var dataz = extend({}, parentDataObject)
 	var unnamedParameters = 0
 
 	pieces.forEach(function(piece) {
@@ -29,10 +30,7 @@ function getTemplateDataObject(parentDataObject, pieces) {
 }
 
 function parseTemplate(mixin) {
-	var parentDataObject = mixin.data
-	if (!parentDataObject) {
-		parentDataObject = mixin.ractive ? mixin.ractive.get() : {}
-	}
+	var parentDataObject = extend(mixin.rootData, mixin.data, mixin.ractive ? mixin.ractive.get() : {})
 
 	mixin.templateElements = []
 

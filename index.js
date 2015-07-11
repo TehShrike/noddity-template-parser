@@ -1,4 +1,5 @@
 var Mixins = require('./mixins')
+var extend = require('xtend')
 
 function Renderer(butler, linkify) {
 	var mixins = Mixins(butler, linkify)
@@ -14,8 +15,17 @@ function Renderer(butler, linkify) {
 		})
 	}
 
-	function renderMarkdown(post, cb) {
+	function renderMarkdown(post, rootData, cb) {
+		if (typeof rootData === 'function') {
+			cb = rootData
+			rootData = {}
+		}
+
+		rootData.current = post.filename
+
 		var mixin = mixins.makeNewMixinObject(post)
+
+		mixin.rootData = rootData
 
 		mixin.html = linkify(post.content) // skip the html step entirely for the top-level post
 		mixins.parseTemplate(mixin)
@@ -31,8 +41,15 @@ function Renderer(butler, linkify) {
 		})
 	}
 
-	function renderPost(post, cb) {
+	function renderPost(post, rootData, cb) {
+		if (typeof rootData === 'function') {
+			cb = rootData
+			rootData = {}
+		}
+		rootData.current = post.filename
+
 		var mixin = mixins.makeNewMixinObject(post)
+		mixin.rootData = rootData
 
 		renderMixin(mixin)
 
@@ -92,7 +109,7 @@ function Renderer(butler, linkify) {
 		})
 	}
 
-	function populateRootRactive(post, ractive) {
+	function populateRootRactive(post, ractive, rootData) {
 		var mixin = mixins.makeNewMixinObject(post)
 		mixin.ractive = ractive
 		mixins.mixinHtml(mixin)

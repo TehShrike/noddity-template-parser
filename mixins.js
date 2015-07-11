@@ -4,6 +4,7 @@ var EventEmitter = require('events').EventEmitter
 var Ractive = require('ractive')
 var updateEmitterMixinFactory = require('./updateEmitterMixin.js')
 var cheerio = require('cheerio')
+var extend = require('xtend')
 
 var errorTemplate = Ractive.parse('{{error}}')
 
@@ -16,7 +17,7 @@ function render(mixin) {
 	try {
 		return new Ractive({
 			el: null,
-			data: mixin.data,
+			data: extend(mixin.rootData || {}, mixin.data),
 			template: templateHtml,
 			preserveWhitespace: true
 		}).toHTML()
@@ -85,7 +86,7 @@ function mixinRenderedHtmlEmitter(mixin) {
 			})
 		} else {
 			var mergedSoFar = 0
-			var mergeChildHtmlIntoRenderedHtml = function mergeChildHtmlIntoRenderedHtml(childMixin) {
+			function mergeChildHtmlIntoRenderedHtml(childMixin) {
 				replaceTemplateElementWithHtml(mixin, childMixin)
 				mergedSoFar += 1
 				if (mergedSoFar >= mixin.templateElements.length) {

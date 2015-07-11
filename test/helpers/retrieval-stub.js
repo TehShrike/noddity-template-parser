@@ -15,7 +15,8 @@ module.exports = function TestRetrieval() {
 		index.push(name)
 		posts[name] = {
 			metadata: metadata,
-			content: content
+			content: content,
+			filename: name
 		}
 	}
 	this.getIndex = function getIndex(cb) {
