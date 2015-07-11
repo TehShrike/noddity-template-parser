@@ -3,6 +3,8 @@ var Renderer = require('../')
 var linkify = require('noddity-linkifier')('').linkify
 var testState = require('./helpers/test-state')
 
+require('ractive').DEBUG = false
+
 test('Embeds a template', function(t) {
 	var state = testState()
 
