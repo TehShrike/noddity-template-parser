@@ -34,7 +34,7 @@ function Renderer(butler, linkify) {
 		mixin.on('all child posts fetched', function(mixin) {
 			mixin.templateElements.forEach(renderMixin)
 			mixins.renderChildrenIntoTemplates(mixin, function(mixin) {
-				cb(null, mixin.renderedHtml)
+				cb(null, mixin.renderedHtml || mixin.html)
 			})
 		})
 	}
@@ -52,7 +52,7 @@ function Renderer(butler, linkify) {
 		renderMixin(mixin)
 
 		mixin.on('final html rendered', function(mixin) {
-			cb(null, mixin.renderedHtml)
+			cb(null, mixin.renderedHtml || mixin.html)
 		})
 	}
 
