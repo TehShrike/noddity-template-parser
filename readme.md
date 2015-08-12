@@ -25,10 +25,12 @@ The Noddity renderer has two functions, each almost entirely different in purpos
 
 The two functions exposed are:
 
-populateRootRactive(post, ractive)
+populateRootRactive(post, [rootData], ractive)
 -----
 
-"post" is an an object returned by [noddity-retrieval](https://github.com/TehShrike/noddity-retrieval), and "ractive" is an insantiated [Ractive](http://www.ractivejs.org/) object.
+`post` is an an object returned by [noddity-retrieval](https://github.com/TehShrike/noddity-retrieval), and "ractive" is an insantiated [Ractive](http://www.ractivejs.org/) object.
+
+`rootData` is the default data passed to ractive.
 
 Three values will be set on the given ractive element:
 
@@ -38,9 +40,11 @@ Three values will be set on the given ractive element:
 
 The renderer will watch for a teardown event and will tear down all the child/template Ractive elements when it is observed.
 
-renderPost(post, cb)
+renderPost(post, [rootData], cb)
 -----
 
 Calls the callback with the rendered html for the given post.  To do this, it recursively renders all embedded/template posts in the root post.
+
+`rootData` is the default data passed to ractive.
 
 The callback should expect the traditional error-first arguments `(err, html)` - though, uh,
