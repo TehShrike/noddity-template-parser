@@ -1,7 +1,7 @@
 var stringTemplate = require('string-template/compile')
 var getTemplateDataObject = require('./parse-template-arguments.js')
 
-var generatePostSpan = stringTemplate('<span class="noddity-template" data-noddity-post-file-name="{0}" data-noddity-template-arguments="{1}"></span>')
+var generatePostSpan = stringTemplate('<span class=\'noddity-template\' data-noddity-post-file-name=\'{0}\' data-noddity-template-arguments=\'{1}\'></span>')
 
 function turnNoddityTemplatesIntoHtmlElements(html) {
 	return html.replace(/<code[\s\S]+?<\/code|::(.+?)::/gm, function(match, templateText) {
@@ -10,8 +10,8 @@ function turnNoddityTemplatesIntoHtmlElements(html) {
 		} else {
 			var pieces = templateText.split('|')
 			var postName = pieces.shift()
-			var templateArguments = getTemplateDataObject(pieces)
-
+			var templateObject = getTemplateDataObject(pieces)
+			var templateArguments = JSON.stringify(templateObject)
 			return generatePostSpan(postName, templateArguments)
 		}
 	})
