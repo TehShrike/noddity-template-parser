@@ -13,7 +13,7 @@ test('no changes', function(t) {
 
 	var html = renderer(post, linkify)
 
-	t.equal(html, '<p>sup dawg.</p><p>I see you like {{prop}} templates</p>')
+	t.equal(html, '<p>sup dawg.</p>\n<p>I see you like {{prop}} templates</p>\n')
 	t.end()
 })
 
@@ -28,7 +28,7 @@ test('with a link', function(t) {
 
 	var html = renderer(post, linkify)
 
-	t.equal(html, '<p><a href="prefix/destination">friendly</a></p><p>I see you like {{prop}} templates</p>')
+	t.equal(html, '<p><a href="prefix/destination">friendly</a></p>\n<p>I see you like {{prop}} templates</p>\n')
 	t.end()
 })
 
@@ -43,6 +43,21 @@ test('with an embedded template', function(t) {
 
 	var html = renderer(post, linkify)
 
-	t.equal(html, '<p><span class="noddity-template" data-noddity-post-file-name="child" data-noddity-template-arguments="{ \\"0\\": \\"arg\\" }"></span></p><p>I see you like {{prop}} templates</p>')
+	t.equal(html, '<p><span class=\'noddity-template\' data-noddity-post-file-name=\'child\' data-noddity-template-arguments=\'{"1":"arg"}\'></span></p>\n<p>I see you like {{prop}} templates</p>\n')
+	t.end()
+})
+
+test('no html output', function(t) {
+	var post = {
+		content: '::child|arg::\n\nI see you like {{prop}} templates',
+		metadata: {
+			prop: 'val'
+		}
+	}
+	var linkify = Linkify('prefix/')
+
+	var html = renderer(post, linkify, { convertToHtml: false })
+
+	t.equal(html, '<span class=\'noddity-template\' data-noddity-post-file-name=\'child\' data-noddity-template-arguments=\'{"1":"arg"}\'></span>\n\nI see you like {{prop}} templates')
 	t.end()
 })
