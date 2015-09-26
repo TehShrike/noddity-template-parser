@@ -1,9 +1,6 @@
 var test = require('tape')
 var Linkify = require('noddity-linkifier')
-var renderer = require('../')
-var quotemeta = require('quotemeta')
-
-var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+var parser = require('../')
 
 test('no changes', function(t) {
 	var post = {
@@ -14,9 +11,14 @@ test('no changes', function(t) {
 	}
 	var linkify = Linkify('prefix/')
 
-	var html = renderer(post, linkify)
+	var pieces = parser(post, linkify)
 
-	t.equal(html, '<p>sup dawg.</p>\n<p>I see you like {{prop}} templates</p>\n')
+	t.deepEqual(pieces, [
+		{
+			type: 'string',
+			value: '<p>sup dawg.</p>\n<p>I see you like {{prop}} templates</p>\n'
+		}
+	])
 	t.end()
 })
 
@@ -29,9 +31,14 @@ test('with a link', function(t) {
 	}
 	var linkify = Linkify('prefix/')
 
-	var html = renderer(post, linkify)
+	var pieces = parser(post, linkify)
 
-	t.equal(html, '<p><a href="prefix/destination">friendly</a></p>\n<p>I see you like {{prop}} templates</p>\n')
+	t.deepEqual(pieces, [
+		{
+			type: 'string',
+			value: '<p><a href="prefix/destination">friendly</a></p>\n<p>I see you like {{prop}} templates</p>\n'
+		}
+	])
 	t.end()
 })
 
@@ -44,11 +51,20 @@ test('with an embedded template', function(t) {
 	}
 	var linkify = Linkify('prefix/')
 
-	var html = renderer(post, linkify)
+	var pieces = parser(post, linkify)
 
-	var expectedRegex = new RegExp(quotemeta('<p><span class=\'noddity-template\' data-noddity-post-file-name=\'child\' data-noddity-template-arguments=\'{"1":"arg"}\' data-noddity-partial-name=\'') + UUID_V4_REGEX + quotemeta('\'>{{>') + UUID_V4_REGEX + quotemeta('}}</span></p>\n<p>I see you like {{prop}} templates</p>\n'))
-
-	t.ok(expectedRegex.test(html))
+	t.deepEqual(pieces, [
+		{
+			type: 'template',
+			filename: 'child',
+			arguments: {
+				1: 'arg'
+			}
+		}, {
+			type: 'string',
+			value: '\n\n<p>I see you like {{prop}} templates</p>\n'
+		}
+	])
 	t.end()
 })
 
@@ -61,10 +77,19 @@ test('no html output', function(t) {
 	}
 	var linkify = Linkify('prefix/')
 
-	var html = renderer(post, linkify, { convertToHtml: false })
+	var pieces = parser(post, linkify, { convertToHtml: false })
 
-	var expectedRegex = new RegExp(quotemeta('<span class=\'noddity-template\' data-noddity-post-file-name=\'child\' data-noddity-template-arguments=\'{"1":"arg"}\' data-noddity-partial-name=\'') + UUID_V4_REGEX + quotemeta('\'>{{>') + UUID_V4_REGEX + quotemeta('}}</span>\n\nI see you like {{prop}} templates'))
-
-	t.ok(expectedRegex.test(html))
+	t.deepEqual(pieces, [
+		{
+			type: 'template',
+			filename: 'child',
+			arguments: {
+				1: 'arg'
+			}
+		}, {
+			type: 'string',
+			value: '\n\nI see you like {{prop}} templates\n'
+		}
+	])
 	t.end()
 })
