@@ -1,12 +1,5 @@
 var test = require('tape')
 var ntt = require('../noddity-template-transformer.js')
-var quotemeta = require('quotemeta')
-
-var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
-
-function matches(input, str) {
-	return new RegExp(quotemeta(str).replace(/UUID_HERE/g, UUID_V4_REGEX)).test(input)
-}
 
 test('Noddity Template Transformer', function (t) {
 	t.deepEqual(ntt('no template here'), [{
@@ -16,11 +9,11 @@ test('Noddity Template Transformer', function (t) {
 	t.deepEqual(ntt('<code>::dont.md|parse|me::</code>'), [{
 		type:'string',
 		value: '<code>::dont.md|parse|me::</code>'
-	]})
+	}])
 	t.deepEqual(ntt('::dont.md|parse|me\n::'), [{
 		type:'string',
 		value: '::dont.md|parse|me\n::'
-	]})
+	}])
 	t.deepEqual(ntt('<code>\n\n::dont.md|parse|me::\n\n</code>'), [{
 		type: 'string',
 		value: '<code>\n\n::dont.md|parse|me::\n\n</code>'
