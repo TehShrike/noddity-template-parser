@@ -62,7 +62,7 @@ test('with an embedded template', function(t) {
 			}
 		}, {
 			type: 'string',
-			value: '\n\n<p>I see you like {{prop}} templates</p>\n'
+			value: '\n\n<p>I see you like {{prop}} templates</p>'
 		}
 	])
 	t.end()
@@ -88,7 +88,7 @@ test('no html output', function(t) {
 			}
 		}, {
 			type: 'string',
-			value: '\n\nI see you like {{prop}} templates\n'
+			value: '\n\nI see you like {{prop}} templates'
 		}
 	])
 	t.end()
