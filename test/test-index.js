@@ -55,6 +55,9 @@ test('with an embedded template', function(t) {
 
 	t.deepEqual(pieces, [
 		{
+			type: 'string',
+			value: '<p>'
+		}, {
 			type: 'template',
 			filename: 'child',
 			arguments: {
@@ -62,7 +65,7 @@ test('with an embedded template', function(t) {
 			}
 		}, {
 			type: 'string',
-			value: '\n\n<p>I see you like {{prop}} templates</p>'
+			value: '</p>\n<p>I see you like {{prop}} templates</p>\n'
 		}
 	])
 	t.end()
