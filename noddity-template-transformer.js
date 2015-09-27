@@ -2,41 +2,29 @@ var getTemplateDataObject = require('./parse-template-arguments.js')
 var execAll = require('regexp.execall')
 
 function turnNoddityTemplatesIntoHtmlElements(html) {
-	var result = []
-	var finished = false
-	var startSearchIndex = 0
-
-	execAll(/<code>.+?<\/code>|::.+?::/, html).forEach(function (matches))
-		var searchString = html.slice(startSearchIndex)
-		var found = searchString.search()
-		if (found === -1) {
-			finished = true
-		} else if (searchString[found] === ':') {
-			if (found > startSearchIndex) {
-				result.push({
-					type: 'string',
-					value: searchString.slice(0, found - 1) // not sure about the "- 1" bit
-				})
-			}
-			var templateText = searchString.exec(/::([^:]+?)::/)
-			var pieces = templateText.split('|')
+	var regex = /((?:<code>[\s\S]*?<\/code>|[\s\S])*?)(?:::(.+?)::|$)/g
+	var results = execAll(regex, html).map(function (execResult) {
+		var result = []
+		if (execResult[1]) {
+			result.push({
+				type: 'string',
+				value: execResult[1]
+			})
+		}
+		if (execResult[2]) {
+			var pieces = execResult[2].split('|')
 			var filename = pieces.shift()
 			var args = getTemplateDataObject(pieces)
 			result.push({
-				type:'template',
-				filename: filaname,
+				type: 'template',
+				filename: filename,
 				arguments: args
 			})
-		} else {
-			searchString
 		}
-	}
-	return html.replace(/<code[\s\S]+?<\/code|::(.+?)::/gm, function(match, templateText) {
-		if (match.slice(0, 5) === '<code') {
-			return match
-		} else {
-		}
+		return result
 	})
+	var flattenedResults = [].concat.apply([], results)
+	return flattenedResults
 }
 
 module.exports = turnNoddityTemplatesIntoHtmlElements
