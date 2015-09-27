@@ -20,9 +20,8 @@
   },
   "homepage": "https://github.com/TehShrike/noddity-renderer",
   "dependencies": {
-    "random-uuid-v4": "0.0.5",
-    "remarkable": "^1.6.0",
-    "string-template": "^0.2.1"
+    "regexp.execall": "^1.0.2",
+    "remarkable": "^1.6.0"
   },
   "devDependencies": {
     "noddity-linkifier": "^2.1.0",
