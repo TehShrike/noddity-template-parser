@@ -17,6 +17,10 @@ test('Noddity Template Transformer', function (t) {
 		type:'string',
 		value: '<code>::dont.md|parse|me::</code>'
 	]})
+	t.deepEqual(ntt('::dont.md|parse|me\n::'), [{
+		type:'string',
+		value: '::dont.md|parse|me\n::'
+	]})
 	t.deepEqual(ntt('<code>\n\n::dont.md|parse|me::\n\n</code>'), [{
 		type: 'string',
 		value: '<code>\n\n::dont.md|parse|me::\n\n</code>'
@@ -29,6 +33,19 @@ test('Noddity Template Transformer', function (t) {
 			2: 'me'
 		}
 	}])
+	t.deepEqual(ntt('<code></code>::do.parse::<code></code>'), [
+		{
+			type: 'string',
+			value: '<code></code>'
+		}, {
+			type: 'template',
+			filename: 'do.parse',
+			arguments: {}
+		}, {
+			type: 'string',
+			value: '<code></code>'
+		}
+	])
 	t.deepEqual(ntt('::two.in::::a.row::'), [
 		{
 			type: 'template',
