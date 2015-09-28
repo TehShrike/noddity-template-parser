@@ -3,10 +3,9 @@ var execAll = require('regexp.execall')
 
 function turnNoddityTemplatesIntoHtmlElements(html) {
 	var regex = /((?:<code>[\s\S]*?<\/code>|[\s\S])*?)(?:::(.+?)::|$)/g
-	var results = execAll(regex, html).map(function (execResult) {
-		var result = []
+	return execAll(regex, html).reduce(function (memo, execResult) {
 		if (execResult[1]) {
-			result.push({
+			memo.push({
 				type: 'string',
 				value: execResult[1]
 			})
@@ -15,16 +14,14 @@ function turnNoddityTemplatesIntoHtmlElements(html) {
 			var pieces = execResult[2].split('|')
 			var filename = pieces.shift()
 			var args = getTemplateDataObject(pieces)
-			result.push({
+			memo.push({
 				type: 'template',
 				filename: filename,
 				arguments: args
 			})
 		}
-		return result
-	})
-	var flattenedResults = [].concat.apply([], results)
-	return flattenedResults
+		return memo
+	}, [])
 }
 
 module.exports = turnNoddityTemplatesIntoHtmlElements
