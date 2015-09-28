@@ -1,6 +1,6 @@
 {
   "name": "noddity-renderer",
-  "version": "3.4.2",
+  "version": "4.0.0-alpha.2",
   "description": "Turns Noddity posts into html and stuff",
   "main": "index.js",
   "scripts": {
@@ -19,19 +19,12 @@
     "url": "https://github.com/TehShrike/noddity-renderer/issues"
   },
   "homepage": "https://github.com/TehShrike/noddity-renderer",
-  "devDependencies": {
-    "level-mem": "^0.18.0",
-    "noddity-butler": "^2.0.0",
-    "noddity-linkifier": "^2.1.0",
-    "tape": "^4.0.0"
-  },
   "dependencies": {
-    "cheerio": "^0.19.0",
-    "ractive": "^0.7.3",
-    "remarkable": "^1.6.0",
-    "xtend": "^4.0.0"
+    "regexp.execall": "^1.0.2",
+    "remarkable": "^1.6.0"
   },
-  "browser": {
-    "cheerio": "./fake-cheerio.js"
+  "devDependencies": {
+    "noddity-linkifier": "^2.1.0",
+    "tape": "^4.2.0"
   }
 }
