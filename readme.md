@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TehShrike/noddity-renderer.svg)](https://travis-ci.org/TehShrike/noddity-renderer)
+[![Build Status](https://travis-ci.org/TehShrike/noddity-template-parser.svg)](https://travis-ci.org/TehShrike/noddity-template-parser)
 
 Turns [Noddity](http://noddity.com) post objects into HTML and handles turning inter-site links into <a> tags and generating `<span class=\'noddity-template\' data-noddity-post-file-name=\'child\' data-noddity-template-arguments=\'{"1":"arg"}\'></span>` span elements for embedded templates.
 
@@ -7,7 +7,7 @@ Turns [Noddity](http://noddity.com) post objects into HTML and handles turning i
 
 ```js
 
-var render = require('noddity-renderer')
+var render = require('noddity-template-parser')
 var Linkify = require('linkify')
 
 var linkify = Linkify('#/prefix')
