@@ -1,7 +1,27 @@
-# Deprecated
+[![Build Status](https://travis-ci.org/TehShrike/noddity-renderer.svg)](https://travis-ci.org/TehShrike/noddity-renderer)
 
-This module has been deprecated.
+Turns [Noddity](http://noddity.com) post objects into HTML and handles turning inter-site links into <a> tags and generating `<span class=\'noddity-template\' data-noddity-post-file-name=\'child\' data-noddity-template-arguments=\'{"1":"arg"}\'></span>` span elements for embedded templates.
 
-The guts of it have moved to noddity-parse-template.
+## Usage
 
-The API bits that you probably want to include have moved to [noddity-render-static](https://www.npmjs.com/package/noddity-render-static), for server-side generation of HTML, and [noddity-render-dom](https://www.npmjs.com/package/noddity-render-dom), for constructing and updating Ractive objects in the browser.
+
+```js
+
+var render = require('noddity-renderer')
+var Linkify = require('linkify')
+
+var linkify = Linkify('#/prefix')
+
+var html = render(post, linkify)
+
+```
+
+To produce Markdown files instead of HTML, pass in an `options` object with `convertToHtml` set to false:
+
+```js
+var html = render(post, linkify, { convertToHtml: false })
+```
+
+## License
+
+[WTFPL](http://wtfpl2.com)
