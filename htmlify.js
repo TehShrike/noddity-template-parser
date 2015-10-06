@@ -13,7 +13,7 @@ module.exports = function htmlify(post) {
 }
 
 function decodeRactiveExpressions(html) {
-	return html.replace(/\{\{(.+)\}\}/g, function(m, content) {
+	return html.replace(/\{\{(.+?)\}\}/g, function(m, content) {
 		return '{{' + decode(content) + '}}'
 	})
 }

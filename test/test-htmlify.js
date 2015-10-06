@@ -26,5 +26,7 @@ test('Doesn\'t replace entities inside of Ractive expressions', function(t) {
 
 	t.equal(html('< {{>}}'), '<p>&lt; {{>}}</p>\n')
 	t.equal(html('"sup" {{"sup"}}'), '<p>&quot;sup&quot; {{"sup"}}</p>\n')
+
+	t.equal(html('"sup" {{"sup"}} <3 {{1<3}}'), '<p>&quot;sup&quot; {{"sup"}} &lt;3 {{1<3}}</p>\n')
 	t.end()
 })
