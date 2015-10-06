@@ -18,3 +18,13 @@ test('Respects post.metadata.markdown field', function (t) {
 
 	t.end()
 })
+
+test('Doesn\'t replace entities inside of Ractive expressions', function(t) {
+	function html(content) {
+		return htmlify({ content: content, metadata: { markdown: true }})
+	}
+
+	t.equal(html('< {{>}}'), '<p>&lt; {{>}}</p>\n')
+	t.equal(html('"sup" {{"sup"}}'), '<p>&quot;sup&quot; {{"sup"}}</p>\n')
+	t.end()
+})

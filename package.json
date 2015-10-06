@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/TehShrike/noddity-template-parser",
   "dependencies": {
+    "ent": "2.2.0",
     "regexp.execall": "^1.0.2",
     "remarkable": "^1.6.0"
   },
