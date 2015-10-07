@@ -2,7 +2,7 @@
 
 Turns [Noddity](http://noddity.com) post objects into basic [abstract syntax trees](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
 
-## Usage
+## Example
 
 ```js
 var parser = require('noddity-template-parser')
@@ -30,7 +30,7 @@ var parser = require('noddity-template-parser')
 - `post`: a Noddity post object (from a [Noddity Butler](https://github.com/TehShrike/noddity-butler))
 - `linkify`: a [Noddity Linkifier](https://github.com/TehShrike/noddity-linkifier)
 - `options`: an optional object of options
-	- `convertToHtml`: To produce Markdown files instead of HTML, set to false
+	- `convertToHtml`: convert posts from markdown to HTML. Defaults to true. (If `markdown: false` is on the post's metadata, it will not be converted, even when this is set to true.)
 
 ```js
 var ast = parser(post, linkify, { convertToHtml: false })
@@ -53,7 +53,7 @@ The AST for this post...
 prop: val
 ---
 
-::child|arg::
+::child|arg|key=value::
 
 I see you like {{prop}} templates
 ```
@@ -68,7 +68,8 @@ I see you like {{prop}} templates
 	type: 'template',
 	filename: 'child',
 	arguments: {
-		1: 'arg'
+		1: 'arg',
+		key: 'value'
 	}
 }, {
 	type: 'string',
