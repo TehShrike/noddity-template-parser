@@ -1,25 +1,79 @@
 [![Build Status](https://travis-ci.org/TehShrike/noddity-template-parser.svg)](https://travis-ci.org/TehShrike/noddity-template-parser)
 
-Turns [Noddity](http://noddity.com) post objects into HTML and handles turning inter-site links into <a> tags and generating `<span class=\'noddity-template\' data-noddity-post-file-name=\'child\' data-noddity-template-arguments=\'{"1":"arg"}\'></span>` span elements for embedded templates.
+Turns [Noddity](http://noddity.com) post objects into basic [abstract syntax trees](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
 
 ## Usage
 
-
 ```js
-
-var render = require('noddity-template-parser')
+var parser = require('noddity-template-parser')
 var Linkify = require('linkify')
 
 var linkify = Linkify('#/prefix')
 
-var html = render(post, linkify)
+var ast = parser(post, linkify)
 
+var full = ast.reduce(function (full, piece) {
+	if (piece.type === 'string') full += piece.value
+	if (piece.type === 'template') full += 'TEMPLATE GOES HERE'
+	return full
+}, '')
 ```
 
-To produce Markdown files instead of HTML, pass in an `options` object with `convertToHtml` set to false:
+## API
 
 ```js
-var html = render(post, linkify, { convertToHtml: false })
+var parser = require('noddity-template-parser')
+```
+
+### `var ast = parser(post, linkify, [options])`
+
+- `post`: a Noddity post object (from a [Noddity Butler](https://github.com/TehShrike/noddity-butler))
+- `linkify`: a [Noddity Linkifier](https://github.com/TehShrike/noddity-linkifier)
+- `options`: an optional object of options
+	- `convertToHtml`: To produce Markdown files instead of HTML, set to false
+
+```js
+var ast = parser(post, linkify, { convertToHtml: false })
+```
+
+### `ast`
+
+An array of objects returned from `parser()`. Each object has a type property which can be `string`, or `template`.
+
+- `string` type properties:
+	- `value` string with html or markdown
+- `template` type properties:
+	- `filename` string, e.g. `'my-post.md'`
+	- `arguments` object, e.g. `{ 1: 'hello', key: 'value' }`
+
+The AST for this post...
+
+```
+---
+prop: val
+---
+
+::child|arg::
+
+I see you like {{prop}} templates
+```
+
+...would look like:
+
+```js
+[{
+	type: 'string',
+	value: '<p>'
+}, {
+	type: 'template',
+	filename: 'child',
+	arguments: {
+		1: 'arg'
+	}
+}, {
+	type: 'string',
+	value: '</p>\n<p>I see you like {{prop}} templates</p>\n'
+}]
 ```
 
 ## License
