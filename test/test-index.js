@@ -96,3 +96,23 @@ test('no html output', function(t) {
 	])
 	t.end()
 })
+
+test('no html output, with html entities', function(t) {
+	var post = {
+		content: '> block quote!',
+		metadata: {
+			prop: 'val'
+		}
+	}
+	var linkify = Linkify('prefix/')
+
+	var pieces = parser(post, linkify, { convertToHtml: false })
+
+	t.deepEqual(pieces, [
+		{
+			type: 'string',
+			value: '> block quote!'
+		}
+	])
+	t.end()
+})
