@@ -1,17 +1,23 @@
 var getTemplateDataObject = require('./parse-template-arguments.js')
 var execAll = require('regexp.execall')
 
-function turnNoddityTemplatesIntoHtmlElements(html) {
+var charactersToEscape = /[\{\}]/g
+var codeBlocks = /<code>[\s\S]*?<\/code>/g
+
+module.exports = function turnNoddityTemplatesIntoHtmlElements(html) {
 	var regex = /((?:<code>[\s\S]*?<\/code>|[\s\S])*?)(?:::(.+?)::|$)/g
-	return execAll(regex, html).reduce(function (memo, execResult) {
-		if (execResult[1]) {
+	return execAll(regex, html).reduce(function(memo, execResult) {
+		var regularTemplateBit = execResult[1]
+		var embeddedTemplateReference = execResult[2]
+
+		if (regularTemplateBit) {
 			memo.push({
 				type: 'string',
-				value: execResult[1]
+				value: escapeCharactersInCodeBlocks(regularTemplateBit, charactersToEscape)
 			})
 		}
-		if (execResult[2]) {
-			var pieces = execResult[2].split('|')
+		if (embeddedTemplateReference) {
+			var pieces = embeddedTemplateReference.split('|')
 			var filename = pieces.shift()
 			var args = getTemplateDataObject(pieces)
 			memo.push({
@@ -24,4 +30,12 @@ function turnNoddityTemplatesIntoHtmlElements(html) {
 	}, [])
 }
 
-module.exports = turnNoddityTemplatesIntoHtmlElements
+
+
+function escapeCharactersInCodeBlocks(str, regex) {
+	return str.replace(codeBlocks, function(match) {
+		return match.replace(regex, function(match) {
+			return '&#' + match.charCodeAt() + ';'
+		})
+	})
+}

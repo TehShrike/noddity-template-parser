@@ -116,3 +116,45 @@ test('no html output, with html entities', function(t) {
 	])
 	t.end()
 })
+
+test('curly braces in code blocks (single tick) should be replaced with html entities', function(t) {
+	var linkify = Linkify('prefix/')
+	var post = {
+		content: 'an {{expression}} and `another {{expression}} in code`',
+		metadata: {
+			expression: 'arglebarg'
+		}
+	}
+
+	var pieces = parser(post, linkify)
+
+	t.deepEqual(pieces, [{
+		type: 'string',
+		value: '<p>an {{expression}} and <code>another &#123;&#123;expression&#125;&#125; in code</code></p>\n'
+	}])
+
+	t.end()
+})
+
+test('curly braces in code blocks (triple tick) should be replaced with html entities', function(t) {
+	var linkify = Linkify('prefix/')
+	var post = {
+		content: ['another',
+			'```',
+			'{{code}}',
+			'```',
+			'block'].join('\n'),
+		metadata: {
+			expression: 'arglebarg'
+		}
+	}
+
+	var pieces = parser(post, linkify)
+
+	t.deepEqual(pieces, [{
+		type: 'string',
+		value: '<p>another</p>\n<pre><code>&#123;&#123;code&#125;&#125;\n</code></pre>\n<p>block</p>\n'
+	}])
+
+	t.end()
+})
