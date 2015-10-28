@@ -1,6 +1,6 @@
 {
   "name": "noddity-template-parser",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Turns Noddity posts into a really simple AST",
   "main": "index.js",
   "scripts": {
