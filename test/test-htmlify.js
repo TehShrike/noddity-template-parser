@@ -1,6 +1,10 @@
 var test = require('tape')
 var htmlify = require('../htmlify.js')
 
+function contentToHtml(content) {
+	return htmlify({ content: content, metadata: { markdown: true }})
+}
+
 test('Respects post.metadata.markdown field', function (t) {
 	var originalContent = 'Post content.\n\nMore post content.'
 
@@ -20,13 +24,16 @@ test('Respects post.metadata.markdown field', function (t) {
 })
 
 test('Doesn\'t replace entities inside of Ractive expressions', function(t) {
-	function html(content) {
-		return htmlify({ content: content, metadata: { markdown: true }})
-	}
 
-	t.equal(html('< {{>}}'), '<p>&lt; {{>}}</p>\n')
-	t.equal(html('"sup" {{"sup"}}'), '<p>&quot;sup&quot; {{"sup"}}</p>\n')
+	t.equal(contentToHtml('< {{>}}'), '<p>&lt; {{>}}</p>\n')
+	t.equal(contentToHtml('"sup" {{"sup"}}'), '<p>&quot;sup&quot; {{"sup"}}</p>\n')
 
-	t.equal(html('"sup" {{"sup"}} <3 {{1<3}}'), '<p>&quot;sup&quot; {{"sup"}} &lt;3 {{1<3}}</p>\n')
+	t.equal(contentToHtml('"sup" {{"sup"}} <3 {{1<3}}'), '<p>&quot;sup&quot; {{"sup"}} &lt;3 {{1<3}}</p>\n')
+	t.end()
+})
+
+test('Put ids on headers', function(t) {
+	t.equal(contentToHtml('# sup dawg\n## everybody say "YEAH"').trim(), '<h1 id="sup-dawg">sup dawg</h1>\n'
+		+ '<h2 id="everybody-say-yeah">everybody say &quot;YEAH&quot;</h2>')
 	t.end()
 })
