@@ -57,6 +57,13 @@ test('Noddity Template Transformer', function (t) {
 			parse: 'me'
 		}
 	}])
+	t.deepEqual(ntt('::do parse.md|me::'), [{
+		type: 'template',
+		filename: 'do parse.md',
+		arguments: {
+			1: 'me'
+		}
+	}])
 
 	t.end()
 })
