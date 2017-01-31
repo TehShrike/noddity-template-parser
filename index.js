@@ -8,6 +8,7 @@ module.exports = function(post, linkifier, options) {
 		convertToHtml = false
 	}
 
-	var html = convertToHtml ? htmlify(linkifier.linkify(post.content)) : linkifier.linkify(post.content)
+	var linkifiedContent = linkifier.linkify(post.content)
+	var html = convertToHtml ? htmlify(linkifiedContent) : linkifiedContent
 	return turnContentIntoAnArrayOfObjects(html)
 }
