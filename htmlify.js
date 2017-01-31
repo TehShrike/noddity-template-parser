@@ -14,14 +14,12 @@ var md = new Remarkable('full', {
 
 function slugify(str) {
 	return str.split(/\W+/).filter(function(w) {
-		return w 
+		return w
 	}).join('-').toLowerCase()
 }
 
-module.exports = function htmlify(post, linkify) {
-	var convertToHtml = post.metadata.markdown !== false
-	var content = convertToHtml ? decodeRactiveExpressions(md.render(linkify(post.content))) : linkify(post.content)
-	return content
+module.exports = function htmlify(content) {
+	return decodeRactiveExpressions(md.render(content))
 }
 
 function decodeRactiveExpressions(html) {
