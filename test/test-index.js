@@ -42,6 +42,26 @@ test('with a link', function(t) {
 	t.end()
 })
 
+test('with an encoded link', function(t) {
+	var post = {
+		content: '[[destination&stuff|friendly]]\n\nI see you like {{prop}} templates',
+		metadata: {
+			prop: 'val'
+		}
+	}
+	var linkify = Linkify('prefix/')
+
+	var pieces = parser(post, linkify)
+
+	t.deepEqual(pieces, [
+		{
+			type: 'string',
+			value: '<p><a href="prefix/destination%26stuff">friendly</a></p>\n<p>I see you like {{prop}} templates</p>\n'
+		}
+	])
+	t.end()
+})
+
 test('with an embedded template', function(t) {
 	var post = {
 		content: '::child|arg::\n\nI see you like {{prop}} templates',
@@ -117,6 +137,26 @@ test('no html output, with html entities', function(t) {
 	t.end()
 })
 
+test('no html output, with a link', function(t) {
+	var post = {
+		content: '[[destination&stuff|friendly]]',
+		metadata: {
+			prop: 'val'
+		}
+	}
+	var linkify = Linkify('prefix/')
+
+	var pieces = parser(post, linkify, { convertToHtml: false })
+
+	t.deepEqual(pieces, [
+		{
+			type: 'string',
+			value: '<a href="prefix/destination%26stuff">friendly</a>'
+		}
+	])
+	t.end()
+})
+
 test('curly braces in code blocks (single tick) should be replaced with html entities', function(t) {
 	var linkify = Linkify('prefix/')
 	var post = {
@@ -139,11 +179,11 @@ test('curly braces in code blocks (single tick) should be replaced with html ent
 test('curly braces in code blocks (triple tick) should be replaced with html entities', function(t) {
 	var linkify = Linkify('prefix/')
 	var post = {
-		content: ['another',
+		content: [ 'another',
 			'```',
 			'{{code}}',
 			'```',
-			'block'].join('\n'),
+			'block' ].join('\n'),
 		metadata: {
 			expression: 'arglebarg'
 		}

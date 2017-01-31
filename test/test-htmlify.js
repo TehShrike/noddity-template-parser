@@ -1,23 +1,26 @@
 var test = require('tape')
 var htmlify = require('../htmlify.js')
+var Linkify = require('noddity-linkifier')
 
 function contentToHtml(content) {
-	return htmlify({ content: content, metadata: { markdown: true }})
+	var linkify = Linkify('prefix/')
+	return htmlify({ content: content, metadata: { markdown: true } }, linkify)
 }
 
-test('Respects post.metadata.markdown field', function (t) {
+test('Respects post.metadata.markdown field', function(t) {
+	var linkify = Linkify('prefix/')
 	var originalContent = 'Post content.\n\nMore post content.'
 
 	var post1 = { content: originalContent, metadata: { markdown: false } }
-	var content1 = htmlify(post1)
+	var content1 = htmlify(post1, linkify)
 	t.equal(content1, originalContent, 'Does not turn content into HTML when markdown = false')
 
 	var post2 = { content: originalContent, metadata: {} }
-	var content2 = htmlify(post2)
+	var content2 = htmlify(post2, linkify)
 	t.equal(content2.match(/<p>/g).length, 2, 'Turns content into HTML when markdown = undefined')
 
 	var post3 = { content: originalContent, metadata: { markdown: true } }
-	var content3 = htmlify(post3)
+	var content3 = htmlify(post3, linkify)
 	t.equal(content3.match(/<p>/g).length, 2, 'Turns content into HTML when markdown = true')
 
 	t.end()

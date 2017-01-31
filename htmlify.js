@@ -4,8 +4,8 @@ var decode = require('ent/decode')
 var md = new Remarkable('full', {
 	html: true,
 	linkify: true
-}).use(function (remarkable) {
-	remarkable.renderer.rules.heading_open = function (tokens, idx) {
+}).use(function(remarkable) {
+	remarkable.renderer.rules.heading_open = function(tokens, idx) {
 		var hLevel = tokens[idx].hLevel
 		var slug = slugify(tokens[idx + 1].content)
 		return '<h' + hLevel + ' id="' + slug + '">'
@@ -13,12 +13,14 @@ var md = new Remarkable('full', {
 })
 
 function slugify(str) {
-  return str.split(/\W+/).filter(function(w) { return w }).join('-').toLowerCase()
+	return str.split(/\W+/).filter(function(w) {
+		return w 
+	}).join('-').toLowerCase()
 }
 
-module.exports = function htmlify(post) {
+module.exports = function htmlify(post, linkify) {
 	var convertToHtml = post.metadata.markdown !== false
-	var content = convertToHtml ? decodeRactiveExpressions(md.render(post.content)) : post.content
+	var content = convertToHtml ? decodeRactiveExpressions(md.render(linkify(post.content))) : linkify(post.content)
 	return content
 }
 
