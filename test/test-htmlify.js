@@ -11,7 +11,7 @@ test('Doesn\'t replace entities inside of Ractive expressions', function(t) {
 })
 
 test('Put ids on headers', function(t) {
-	t.equal(htmlify('# sup dawg\n## everybody say "YEAH"').trim(), '<h1 id="sup-dawg">sup dawg</h1>\n'
-		+ '<h2 id="everybody-say-yeah">everybody say &quot;YEAH&quot;</h2>')
+	t.equal(htmlify('# sup dawg\n## everybody say "YEAH"').trim(), '<a class="anchor" href="#sup-dawg"><h1 id="sup-dawg">sup dawg</h1></a>\n'
+		+ '<a class="anchor" href="#everybody-say-yeah"><h2 id="everybody-say-yeah">everybody say &quot;YEAH&quot;</h2></a>')
 	t.end()
 })

@@ -8,7 +8,11 @@ var md = new Remarkable('full', {
 	remarkable.renderer.rules.heading_open = function(tokens, idx) {
 		var hLevel = tokens[idx].hLevel
 		var slug = slugify(tokens[idx + 1].content)
-		return '<h' + hLevel + ' id="' + slug + '">'
+		return '<a class="anchor" href="#' + slug + '"><h' + hLevel + ' id="' + slug + '">'
+	}
+	remarkable.renderer.rules.heading_close = function (tokens, idx) {
+		var hLevel = tokens[idx].hLevel
+		return '</h' + hLevel + '></a>\n'
 	}
 })
 
