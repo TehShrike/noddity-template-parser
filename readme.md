@@ -4,6 +4,8 @@ Turns [Noddity](http://noddity.com) post objects into basic [abstract syntax tre
 
 ## Example
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/TehShrike/noddity-template-parser.svg)](https://greenkeeper.io/)
+
 ```js
 var parser = require('noddity-template-parser')
 var Linkify = require('linkify')
