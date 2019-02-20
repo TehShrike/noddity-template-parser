@@ -6,7 +6,7 @@ Turns [Noddity](http://noddity.com) post objects into basic [abstract syntax tre
 
 ```js
 var parser = require('noddity-template-parser')
-var Linkify = require('noddity-linkify')
+var Linkify = require('noddity-linkifier')
 
 var linkify = Linkify('#/prefix')
 
